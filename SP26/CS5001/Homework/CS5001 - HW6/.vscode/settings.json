@@ -1,0 +1,42 @@
+{
+    // Disable GitHub Copilot
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "python": false
+    },
+    
+    // Disable Copilot suggestions
+    "github.copilot.inlineSuggest.enable": false,
+    
+    // Disable IntelliCode AI-assisted development
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "editor.inlineSuggest.enabled": false,
+    
+    // Disable TabNine
+    "tabnine.experimentalAutoImports": false,
+    
+    // Disable Kite
+    "kite.showWelcomeNotificationOnStartup": false,
+    
+    // Disable AI completions from any extension
+    "editor.suggest.showWords": false,
+    "editor.quickSuggestions": {
+        "other": false,
+        "comments": false,
+        "strings": false
+    },
+    
+    // Additional settings to ensure clean coding environment
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.tabCompletion": "off",
+    "editor.wordBasedSuggestions": "off",
+    "editor.suggestOnTriggerCharacters": false,
+    
+    // Python-specific settings
+    "python.languageServer": "Pylance",
+    "python.analysis.completeFunctionParens": false,
+    "python.analysis.autoImportCompletions": false
+}

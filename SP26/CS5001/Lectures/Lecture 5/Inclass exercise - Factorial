@@ -1,0 +1,46 @@
+
+"""
+In-class Exercise for Recursions
+Code for a recursion where you will receive a number and calculate the factorial for the number using recursion.
+
+Remember the steps for recursion:   
+    1. identify base case
+    2. identify recursive pattern
+"""
+"""
+
+
+def factorial(n):     # Recursive factorial with print statements for tracing
+    print(f"Computing factorial({n})")
+    
+    # Base case - covers special cases
+    if n == 1 or n == 0:
+        return 1
+    # Recursive case - must count down to base case so n-1
+    else:
+        return n * factorial(n-1)
+
+user_input = int(input("Where should we start?"))
+k = user_input
+# Get an input
+print(factorial(k))
+
+# Test it
+"""
+
+def factorial(n):     # Recursive factorial with print statements for tracing
+    print(f"Computing factorial({n})")
+
+    # Base case - covers special cases
+    while:
+        n == 1 or n <= 0
+        return(1)
+    else:
+        return n * factorial(n-1)
+
+user_input = int(input("Where should we start?"))
+k = user_input
+# Get an input
+print(factorial(k))
+
+# Test it

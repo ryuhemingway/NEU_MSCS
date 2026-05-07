@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CS 5002 — Project 1 Part 2: Study Guide</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --fg: #1d2021;
+    --muted: #555;
+    --accent: #b45309;
+    --accent-soft: #fef3c7;
+    --code-bg: #f1efe8;
+    --border: #d6d3c4;
+    --section: #f5f0e1;
+    --q: #1e3a5f;
+    --a: #14532d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 {
+    font-size: 2rem;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: .5rem;
+    margin-bottom: .25rem;
+  }
+  .subtitle { color: var(--muted); font-style: italic; margin-top: 0; }
+  h2 {
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .3rem;
+    margin-top: 2.5rem;
+  }
+  h3 { margin-top: 1.8rem; color: #333; }
+  h4 { margin-top: 1.3rem; color: var(--q); }
+  nav.toc {
+    background: var(--section);
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin: 1.5rem 0 2rem;
+  }
+  nav.toc ol { margin: .3rem 0; padding-left: 1.3rem; }
+  nav.toc a { color: var(--q); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  code, pre {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: .9em;
+  }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    padding: .8rem 1rem;
+    overflow-x: auto;
+    border-radius: 3px;
+    font-size: .85em;
+    line-height: 1.45;
+  }
+  pre code { background: none; padding: 0; }
+  .callout {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    padding: .8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 3px;
+  }
+  .callout-title {
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: .3rem;
+  }
+  .question {
+    background: #e7edf5;
+    border-left: 4px solid var(--q);
+    padding: .7rem 1rem;
+    margin: 1.2rem 0 .5rem;
+    border-radius: 3px;
+  }
+  .question::before { content: "Q "; font-weight: bold; color: var(--q); }
+  .answer {
+    background: #e8f1ea;
+    border-left: 4px solid var(--a);
+    padding: .7rem 1rem;
+    margin: .3rem 0 1.2rem;
+    border-radius: 3px;
+  }
+  .answer::before { content: "A "; font-weight: bold; color: var(--a); }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: .95em;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: .4rem .7rem;
+    text-align: left;
+  }
+  th { background: var(--section); }
+  .num { font-family: 'SF Mono', Menlo, monospace; }
+  .key { font-weight: bold; color: var(--accent); }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 3rem 0; }
+  .big-idea {
+    background: #fff;
+    border: 2px solid var(--accent);
+    padding: 1rem 1.3rem;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+  }
+  .big-idea::before {
+    content: "Big idea";
+    display: block;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: .4rem;
+    font-size: .9em;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+</style>
+</head>
+<body>
+
+<h1>CS 5002 &mdash; Project 1, Part 2</h1>
+<p class="subtitle">Study guide: linear regression via gradient descent, for Ryu Hemingway</p>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#overview">Overview: what you're actually building</a></li>
+    <li><a href="#cost">The cost function $g(a,b)$</a></li>
+    <li><a href="#gd">Gradient descent, intuition and mechanics</a></li>
+    <li><a href="#section1">Section 1: linear data (Q1&ndash;Q5)</a></li>
+    <li><a href="#scaling">Why scaling matters (Q5 answered in depth)</a></li>
+    <li><a href="#unscale">Converting scaled parameters back</a></li>
+    <li><a href="#section2">Section 2: non-linear data (Q1&ndash;Q4)</a></li>
+    <li><a href="#quadratic">The quadratic model fix</a></li>
+    <li><a href="#report">What to put in the report</a></li>
+    <li><a href="#cheat">Quick answer cheat sheet</a></li>
+  </ol>
+</nav>
+
+<hr>
+
+<h2 id="overview">1. Overview: what you're actually building</h2>
+
+<p>You're given 20 patients. For each patient $i$ you know:</p>
+<ul>
+  <li>$x^{(i)}$ &mdash; total cholesterol level (mmol/L)</li>
+  <li>$y^{(i)}$ &mdash; diastolic blood pressure (mm Hg)</li>
+</ul>
+
+<p>Your goal: predict blood pressure from cholesterol. Looking at the plot, the data is roughly a line, so try a linear model:</p>
+
+$$f(x) = ax + b$$
+
+<p>You need to find the best values of $a$ (slope) and $b$ (intercept). "Best" means the line passes as close as possible to all 20 points. To do that, you need:</p>
+
+<ol>
+  <li>A <em>measure</em> of how bad a particular $(a,b)$ is &rarr; the <strong>cost function</strong> $g(a,b)$.</li>
+  <li>An <em>algorithm</em> that finds the $(a,b)$ that minimizes the cost &rarr; <strong>gradient descent</strong>.</li>
+</ol>
+
+<div class="big-idea">
+  You're doing <strong>linear regression from scratch</strong>. Libraries like scikit-learn solve this in one call, but you're implementing the math yourself so you see what's under the hood.
+</div>
+
+<hr>
+
+<h2 id="cost">2. The cost function $g(a,b)$</h2>
+
+<h3>Step-by-step derivation (straight from the PDF)</h3>
+
+<p>For a given patient $i$ and a candidate line $(a, b)$, the prediction is $a x^{(i)} + b$, and the actual value is $y^{(i)}$. The <em>error</em> for that single patient is:</p>
+
+$$a x^{(i)} + b - y^{(i)}$$
+
+<p>Problem: errors can be positive or negative. If we just summed them, a +5 error on patient 1 and a &minus;5 error on patient 2 would cancel out and look like "zero error". Bad.</p>
+
+<p>Fix: square the error. Squares are always non-negative, so nothing cancels:</p>
+
+$$\left(a x^{(i)} + b - y^{(i)}\right)^2$$
+
+<p>Now add this up across all 20 patients to get one number describing how bad the line $(a,b)$ is overall:</p>
+
+$$g(a,b) = \sum_{i=1}^{n} \left(a x^{(i)} + b - y^{(i)}\right)^2$$
+
+<p>This is exactly equation (3) in the PDF. Minimizing $g$ &rarr; finding the best line.</p>
+
+<h3>Code for $g(a,b)$ (Q2)</h3>
+
+<pre><code>def cost_function(a, b, x, y):
+    n = len(x)
+    total = 0.0
+    for i in range(n):
+        total += (a * x[i] + b - y[i]) ** 2
+    return total
+</code></pre>
+
+<p>Straight translation of the formula: loop over patients, accumulate squared errors.</p>
+
+<hr>
+
+<h2 id="gd">3. Gradient descent, intuition and mechanics</h2>
+
+<h3>The hiking-in-fog picture</h3>
+
+<p>Imagine $g(a,b)$ as a landscape: $a$ is east&ndash;west, $b$ is north&ndash;south, altitude is the cost. You want to reach the lowest point. You can't see the whole landscape, but at any point you can feel the slope under your feet. Strategy: take a small step in the direction of <em>steepest descent</em>, then repeat.</p>
+
+<p>Mathematically, the steepest-<em>ascent</em> direction at point $(a, b)$ is the gradient:</p>
+
+$$\nabla g(a,b) = \left(\frac{\partial g}{\partial a},\ \frac{\partial g}{\partial b}\right)$$
+
+<p>We want to go <em>down</em>, so we step in the opposite direction:</p>
+
+$$a_{\text{new}} = a - \alpha \frac{\partial g}{\partial a}, \qquad b_{\text{new}} = b - \alpha \frac{\partial g}{\partial b}$$
+
+<p>where $\alpha$ is the <strong>learning rate</strong> (step size). Repeat until the updates become tiny &mdash; that's your converged minimum.</p>
+
+<h3>How the code estimates the partials</h3>
+
+<p>You could compute $\partial g/\partial a$ analytically (it's $2\sum x^{(i)}(a x^{(i)} + b - y^{(i)})$), but the project uses a <em>numerical</em> approximation &mdash; the same definition of derivative you saw in calculus, just without taking the limit:</p>
+
+$$\frac{\partial g}{\partial a} \approx \frac{g(a + h,\ b) - g(a, b)}{h}$$
+
+<p>for some tiny $h$ (the code uses $h = 10^{-7}$). This is the <em>forward difference</em>.</p>
+
+<pre><code>def approx_partial_x(f, x, y, h=1e-7):
+    return (f(x + h, y) - f(x, y)) / h
+
+def approx_partial_y(f, x, y, h=1e-7):
+    return (f(x, y + h) - f(x, y)) / h
+</code></pre>
+
+<h3>The full loop</h3>
+
+<pre><code>def gradient_descent_2d(f, x0, y0, alpha, epsilon, iter_max=100000):
+    x, y = x0, y0
+    iter = 0
+    while iter &lt; iter_max:
+        grad_x = approx_partial_x(f, x, y)
+        grad_y = approx_partial_y(f, x, y)
+        x_new = x - alpha * grad_x
+        y_new = y - alpha * grad_y
+        # stop when both updates are tiny
+        if abs(x_new - x) &lt; epsilon and abs(y_new - y) &lt; epsilon:
+            x, y = x_new, y_new
+            iter += 1
+            break
+        x, y = x_new, y_new
+        iter += 1
+    return x, y, iter
+</code></pre>
+
+<div class="callout">
+  <div class="callout-title">Why AND, not OR, in the stopping check?</div>
+  It's possible for one parameter to be momentarily flat while the other is still moving. You only want to stop when <em>both</em> have settled. If you used <code>or</code>, you'd bail early and get a bad answer.
+</div>
+
+<hr>
+
+<h2 id="section1">4. Section 1 &mdash; linear data (Q1&ndash;Q5)</h2>
+
+<div class="question" id="s1q1">Read the data and split into arrays $x$ and $y$.</div>
+<div class="answer">
+Use the <code>load_data</code> helper that the PDF gives you verbatim:
+<pre><code>def load_data(filename):
+    data = np.loadtxt(filename)
+    return data[:, 0], data[:, 1]
+
+x, y = load_data('data_chol_dias_pressure.txt')
+</code></pre>
+<code>np.loadtxt</code> reads the text file into a 2D array. <code>data[:, 0]</code> takes every row's first column (cholesterol), <code>data[:, 1]</code> takes every row's second column (BP).
+</div>
+
+<div class="question" id="s1q2">Write a function that computes $g(a, b)$ for any $a$, $b$, $x$, $y$.</div>
+<div class="answer">
+Covered in Section 2 above &mdash; see <code>cost_function(a, b, x, y)</code>. Sum of squared residuals.
+</div>
+
+<div class="question" id="s1q3">Apply gradient descent to find optimal $a^*$ and $b^*$.</div>
+<div class="answer">
+Two-step recipe because raw gradient descent won't converge on unscaled data (see Q5):
+<ol>
+  <li>Standardize both arrays: $x_s = (x - \mu_x)/\sigma_x$ and $y_s = (y - \mu_y)/\sigma_y$.</li>
+  <li>Run gradient descent on $g(a_s, b_s) = \sum (a_s x_s^{(i)} + b_s - y_s^{(i)})^2$ with initial guess $(0, 0)$, learning rate $\alpha = 0.001$, tolerance $\epsilon = 10^{-8}$.</li>
+  <li>Convert $(a_s^*, b_s^*)$ back to original-scale $(a^*, b^*)$ (formulas in <a href="#unscale">Section 6</a>).</li>
+</ol>
+
+<p>Your actual numbers:</p>
+<table>
+  <tr><th>Quantity</th><th>Value</th></tr>
+  <tr><td>$\mu_x$ (mean cholesterol)</td><td class="num">200.00</td></tr>
+  <tr><td>$\sigma_x$ (std cholesterol)</td><td class="num">60.6977</td></tr>
+  <tr><td>$\mu_y$ (mean BP)</td><td class="num">80.0147</td></tr>
+  <tr><td>$\sigma_y$ (std BP)</td><td class="num">12.1876</td></tr>
+  <tr><td>$a_s^*$ (scaled slope)</td><td class="num">0.995131</td></tr>
+  <tr><td>$b_s^*$ (scaled intercept)</td><td class="num">0.000000</td></tr>
+  <tr><td class="key">$a^*$ (original slope)</td><td class="num key">0.199814</td></tr>
+  <tr><td class="key">$b^*$ (original intercept)</td><td class="num key">40.051893</td></tr>
+  <tr><td>Iterations to converge</td><td class="num">374</td></tr>
+  <tr><td>Final cost $g(a^*, b^*)$</td><td class="num">28.86</td></tr>
+</table>
+
+<p>So the best-fit line is approximately $y = 0.1998\,x + 40.05$.</p>
+</div>
+
+<div class="question" id="s1q4">Plot the line along with the data. How does it perform?</div>
+<div class="answer">
+The red line passes through the middle of the blue data cloud. All 20 points are close to the line, with small vertical deviations on both sides. Total squared error of about 28.86 across 20 patients means an average vertical error of about $\sqrt{28.86/20} \approx 1.2$ mm Hg per point &mdash; very tight. <strong>A linear model is an excellent fit for this dataset.</strong>
+</div>
+
+<div class="question" id="s1q5">Was it easy to find initial parameters for gradient descent to converge? Why?</div>
+<div class="answer">
+<strong>No.</strong> Without standardizing, gradient descent diverges almost immediately for any reasonable $\alpha$. See Section 5 below for the full explanation &mdash; this is the hardest conceptual question in the project.
+</div>
+
+<hr>
+
+<h2 id="scaling">5. Why scaling matters (Q5 in depth)</h2>
+
+<h3>The root cause: gradients on different magnitudes</h3>
+
+<p>Compute the partial derivatives analytically:</p>
+
+$$\frac{\partial g}{\partial a} = 2 \sum_{i=1}^{n} x^{(i)}\left(a x^{(i)} + b - y^{(i)}\right)$$
+
+$$\frac{\partial g}{\partial b} = 2 \sum_{i=1}^{n} \left(a x^{(i)} + b - y^{(i)}\right)$$
+
+<p>Notice the difference: $\partial g/\partial a$ has an extra factor of $x^{(i)}$ inside the sum. In this dataset $x^{(i)}$ ranges from 100 to 300, so the gradient with respect to $a$ is roughly <strong>100&ndash;300 times larger in magnitude</strong> than the gradient with respect to $b$.</p>
+
+<h3>What happens in the update</h3>
+
+<p>You apply the <em>same</em> learning rate $\alpha$ to both updates:</p>
+
+$$a \leftarrow a - \alpha \cdot \underbrace{\frac{\partial g}{\partial a}}_{\text{huge}}, \qquad b \leftarrow b - \alpha \cdot \underbrace{\frac{\partial g}{\partial b}}_{\text{small}}$$
+
+<p>You're stuck with an impossible tradeoff:</p>
+
+<ul>
+  <li><strong>Pick $\alpha$ big enough for $b$ to move:</strong> the $a$ update is now gigantic, overshoots wildly, and the cost explodes (often to <code>inf</code> or <code>NaN</code>).</li>
+  <li><strong>Pick $\alpha$ small enough to keep $a$ stable:</strong> $b$ barely moves, and you'd need millions of iterations.</li>
+</ul>
+
+<p>Geometrically, the cost surface $g(a,b)$ is a steep narrow valley &mdash; very curved along $a$, very flat along $b$. Vanilla gradient descent with one $\alpha$ is bad at navigating such "ill-conditioned" surfaces.</p>
+
+<h3>The fix: standardize before fitting</h3>
+
+<p>Standardize (z-score) both variables:</p>
+
+$$x_s = \frac{x - \mu_x}{\sigma_x}, \qquad y_s = \frac{y - \mu_y}{\sigma_y}$$
+
+<p>Now both $x_s$ and $y_s$ have mean 0 and standard deviation 1. The gradients with respect to $a_s$ and $b_s$ end up on the same order of magnitude, the cost surface becomes roughly bowl-shaped (circular contours), and a single $\alpha$ works for both directions. Convergence in a few hundred iterations.</p>
+
+<div class="callout">
+  <div class="callout-title">Short answer for the report</div>
+  No &mdash; without scaling, gradient descent diverges because the partial derivative with respect to $a$ contains factors of $x^{(i)} \in [100, 300]$, making it dramatically larger than the partial with respect to $b$. A single learning rate can't serve both parameters. Z-scoring both variables equalizes the gradient magnitudes, making the cost surface well-conditioned and letting gradient descent converge from any reasonable starting point.
+</div>
+
+<hr>
+
+<h2 id="unscale">6. Converting scaled parameters back to original scale</h2>
+
+<p>Gradient descent on scaled data gives you $(a_s^*, b_s^*)$ satisfying $y_s \approx a_s^* x_s + b_s^*$. But you want the line for the <em>original</em> variables. Derive the conversion by substituting the z-score definitions:</p>
+
+$$\frac{y - \mu_y}{\sigma_y} = a_s\,\frac{x - \mu_x}{\sigma_x} + b_s$$
+
+<p>Solve for $y$:</p>
+
+$$y = \underbrace{a_s\,\frac{\sigma_y}{\sigma_x}}_{a^*}\, x + \underbrace{\mu_y + b_s \sigma_y - a_s\,\frac{\sigma_y \mu_x}{\sigma_x}}_{b^*}$$
+
+<p>Which is exactly what the code computes:</p>
+
+<pre><code>a_opt = a_s_opt * (y_std / x_std)
+b_opt = b_s_opt * y_std + y_mean - a_s_opt * y_std * x_mean / x_std
+</code></pre>
+
+<p>Plugging in your numbers:</p>
+
+<table>
+  <tr><th></th><th>Computation</th><th>Result</th></tr>
+  <tr><td>$a^*$</td><td class="num">0.995131 &times; (12.1876 / 60.6977)</td><td class="num">0.199814</td></tr>
+  <tr><td>$b^*$</td><td class="num">0 &times; 12.1876 + 80.0147 &minus; 0.995131 &times; 12.1876 &times; 200 / 60.6977</td><td class="num">40.051893</td></tr>
+</table>
+
+<hr>
+
+<h2 id="section2">7. Section 2 &mdash; non-linear data (Q1&ndash;Q4)</h2>
+
+<div class="question" id="s2q1">Load the new dataset.</div>
+<div class="answer">
+Same pattern, different file: <code>load_data('data_chol_dias_pressure_non_lin.txt')</code>. Still 20 patients.
+</div>
+
+<div class="question" id="s2q2">Apply gradient descent to find optimal $a^*$ and $b^*$.</div>
+<div class="answer">
+Use the identical procedure from Section 1 (standardize, descend, un-standardize). With $\alpha = 0.001$, $\epsilon = 10^{-8}$, starting at $(0, 0)$:
+<table>
+  <tr><th>Quantity</th><th>Value</th></tr>
+  <tr><td class="key">$a^*$</td><td class="num key">0.139991</td></tr>
+  <tr><td class="key">$b^*$</td><td class="num key">45.386577</td></tr>
+  <tr><td>Iterations</td><td class="num">372</td></tr>
+  <tr><td>Cost $g(a^*, b^*)$</td><td class="num">179.23</td></tr>
+</table>
+<p>So the best line is $y \approx 0.140\,x + 45.39$.</p>
+</div>
+
+<div class="question" id="s2q3">Plot the line. How does it perform? Why is it different from Section 1?</div>
+<div class="answer">
+<p>The fit is noticeably worse. Visually, the line misses the shape of the data: the data points curve, whereas the line is straight. At low cholesterol (~100&ndash;175) the actual BP is nearly flat around 65 mm Hg; at high cholesterol (~250&ndash;300) BP shoots up toward 90+ mm Hg. A straight line has to compromise &mdash; it overshoots the flat low-cholesterol region (predicting higher BP than observed) and undershoots the steep high-cholesterol region.</p>
+<p>Quantitatively the cost jumped from <strong>28.86</strong> (Section 1) to <strong>179.23</strong> &mdash; more than 6&times; worse.</p>
+<p><strong>Why different:</strong> the Section 1 data was genuinely linear, so a linear $f(x)$ matched the underlying relationship. The corrected blood-pressure monitor revealed that the true relationship is <em>non-linear</em> &mdash; roughly flat then curving upward. The <em>algorithm</em> is fine; the <em>model class</em> $f(x) = ax + b$ is too restrictive to represent a curved relationship. No line can fit curved data well.</p>
+</div>
+
+<div class="question" id="s2q4">What modifications can improve the model?</div>
+<div class="answer">
+<p>Replace the linear $f(x) = ax + b$ with something that can bend. Several reasonable options:</p>
+<ul>
+  <li><strong>Quadratic:</strong> $f(x) = a x^2 + b x + c$ (what the code implements).</li>
+  <li><strong>Higher-degree polynomial:</strong> cubic, quartic, etc. (More flexible but easy to overfit 20 points.)</li>
+  <li><strong>Exponential:</strong> $f(x) = a\,e^{bx} + c$.</li>
+  <li><strong>Piecewise linear:</strong> a low-slope line joined to a high-slope line.</li>
+</ul>
+<p>The quadratic is a good first move: it adds just one extra parameter and can capture a single curve. See Section 8 for the implementation and results.</p>
+</div>
+
+<hr>
+
+<h2 id="quadratic">8. The quadratic fix</h2>
+
+<h3>New cost function (three variables)</h3>
+
+$$g(a, b, c) = \sum_{i=1}^{n} \left(a\,(x^{(i)})^2 + b\,x^{(i)} + c - y^{(i)}\right)^2$$
+
+<h3>3D gradient descent</h3>
+
+<p>Same idea, one more partial derivative to track:</p>
+
+$$a \leftarrow a - \alpha\,\frac{\partial g}{\partial a}, \quad b \leftarrow b - \alpha\,\frac{\partial g}{\partial b}, \quad c \leftarrow c - \alpha\,\frac{\partial g}{\partial c}$$
+
+<p>Stop when all three updates are below $\epsilon$.</p>
+
+<pre><code>def gradient_descent_3d(f_3d, a0, b0, c0, alpha, epsilon, iter_max=100000):
+    a, b, c = a0, b0, c0
+    iter = 0
+    while iter &lt; iter_max:
+        grad_a = approx_partial(f_3d, a, b, c, 0)
+        grad_b = approx_partial(f_3d, a, b, c, 1)
+        grad_c = approx_partial(f_3d, a, b, c, 2)
+        a_new, b_new, c_new = a - alpha*grad_a, b - alpha*grad_b, c - alpha*grad_c
+        if (abs(a_new-a) &lt; epsilon and abs(b_new-b) &lt; epsilon
+                and abs(c_new-c) &lt; epsilon):
+            a, b, c = a_new, b_new, c_new
+            break
+        a, b, c = a_new, b_new, c_new
+        iter += 1
+    return a, b, c, iter
+</code></pre>
+
+<h3>Scaling and the back-conversion</h3>
+
+<p>On scaled data we solve $y_s = a_s x_s^2 + b_s x_s + c_s$. Substituting $x_s = (x-\mu_x)/\sigma_x$ and $y_s = (y-\mu_y)/\sigma_y$, then expanding and collecting powers of $x$:</p>
+
+$$A^* = \frac{a_s\,\sigma_y}{\sigma_x^{\,2}}$$
+
+$$B^* = \frac{b_s\,\sigma_y}{\sigma_x} - \frac{2\,a_s\,\sigma_y\,\mu_x}{\sigma_x^{\,2}}$$
+
+$$C^* = \frac{a_s\,\sigma_y\,\mu_x^{\,2}}{\sigma_x^{\,2}} - \frac{b_s\,\sigma_y\,\mu_x}{\sigma_x} + c_s\,\sigma_y + \mu_y$$
+
+<h3>Results</h3>
+
+<table>
+  <tr><th>Quantity</th><th>Value</th></tr>
+  <tr><td>$a_s^*$, $b_s^*$, $c_s^*$ (scaled)</td><td class="num">0.3530, 0.9432, &minus;0.3530</td></tr>
+  <tr><td class="key">$A^*$</td><td class="num key">0.00086308</td></tr>
+  <tr><td class="key">$B^*$</td><td class="num key">&minus;0.205243</td></tr>
+  <tr><td class="key">$C^*$</td><td class="num key">76.7301</td></tr>
+  <tr><td>Iterations</td><td class="num">1020</td></tr>
+  <tr><td>Quadratic cost</td><td class="num">18.67</td></tr>
+  <tr><td>Linear cost (for comparison)</td><td class="num">179.23</td></tr>
+</table>
+
+<p>Best-fit curve: $y \approx 0.000863\,x^2 - 0.2052\,x + 76.73$.</p>
+
+<p>The cost drops by roughly <strong>10&times;</strong> by swapping the linear model for a quadratic. Visually the green curve now tracks the flat-then-rising shape of the data closely.</p>
+
+<div class="big-idea">
+  <strong>The algorithm didn't change &mdash; only the hypothesis class.</strong> Gradient descent doesn't care what $f$ looks like; it only needs a cost $g(\cdot)$ that's differentiable in the parameters. Picking the right functional form for $f$ is a modeling decision, separate from the optimization.
+</div>
+
+<hr>
+
+<h2 id="report">9. What to put in the report</h2>
+
+<ol>
+  <li><strong>How you designed the code.</strong> Walk through: (a) load data, (b) define $g$, (c) numerically approximate partials via forward differences, (d) iterate gradient descent until both parameters converge, (e) standardize before fitting and convert back after.</li>
+  <li><strong>Results for Section 1.</strong> Include the line equation $y = 0.1998\,x + 40.05$, the final cost 28.86, and the plot. Comment on how closely it fits.</li>
+  <li><strong>The scaling story (Q5).</strong> Explain the unequal-gradient-magnitude problem in words and with the $\partial g/\partial a$ vs $\partial g/\partial b$ formulas. State that standardization equalizes them and gives a well-conditioned cost surface.</li>
+  <li><strong>Results for Section 2.</strong> Linear fit $y = 0.140\,x + 45.39$ with cost 179.23, plus the plot showing misfit. Explain that the new data is intrinsically non-linear, so no line will do well.</li>
+  <li><strong>Model improvement.</strong> Argue for a quadratic $f(x) = ax^2 + bx + c$. Note that the optimization algorithm generalizes to three parameters trivially. Report the quadratic fit coefficients and show the ~10&times; cost reduction.</li>
+  <li><strong>Takeaway.</strong> Choice of $f(x)$ matters more than the optimizer. Gradient descent finds the best parameters <em>within</em> a model class; if the class can't represent the true relationship, no amount of optimization fixes that.</li>
+</ol>
+
+<hr>
+
+<h2 id="cheat">10. Quick answer cheat sheet</h2>
+
+<table>
+  <tr><th>Question</th><th>One-line answer</th></tr>
+  <tr><td>S1.Q1: load data</td><td>Use the provided <code>load_data</code>; data is 20&times;2.</td></tr>
+  <tr><td>S1.Q2: cost function</td><td>Sum of squared residuals, $\sum (ax^{(i)}+b-y^{(i)})^2$.</td></tr>
+  <tr><td>S1.Q3: optimal $a^*$, $b^*$</td><td>$a^* \approx 0.1998$, $b^* \approx 40.05$.</td></tr>
+  <tr><td>S1.Q4: how does it fit?</td><td>Excellent &mdash; cost ~29, ~1.2 mm Hg error per point.</td></tr>
+  <tr><td>S1.Q5: easy convergence?</td><td>Only after standardizing; raw scales cause gradient magnitude mismatch.</td></tr>
+  <tr><td>S2.Q1&ndash;Q2: new optimum</td><td>$a^* \approx 0.140$, $b^* \approx 45.39$, cost ~179.</td></tr>
+  <tr><td>S2.Q3: why worse?</td><td>Data is curved; a straight line can't match curvature.</td></tr>
+  <tr><td>S2.Q4: fix?</td><td>Use a quadratic $f(x)=ax^2+bx+c$; cost drops to ~19.</td></tr>
+</table>
+
+<p style="margin-top: 3rem; color: var(--muted); font-style: italic; text-align: center;">
+End of study guide. Good luck on submission.
+</p>
+
+</body>
+</html>
